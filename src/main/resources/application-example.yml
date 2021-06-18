@@ -1,0 +1,15 @@
+---
+kafka:
+  hosts:
+    - 127.0.0.1:9093
+  adminUsername: admin
+  adminPassword: password
+  username: user
+  password: password
+  topicName: test-topic
+  partitions: 1
+  replicas: 1
+  securityEnabled: true
+  acks: all
+  sleepTimeMs: 50
+  consumerGroupId: test-group
