@@ -10,6 +10,8 @@ kafka:
   partitions: 1
   replicas: 1
   securityEnabled: true
+  securityProtocol: SASL_SSL
+  saslMechanism: SCRAM-SHA-256
   acks: all
   sleepTimeMs: 50
   consumerGroupId: test-group

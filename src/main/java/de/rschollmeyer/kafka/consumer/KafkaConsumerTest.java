@@ -44,8 +44,8 @@ public class KafkaConsumerTest implements Runnable {
             String username = kafkaConfiguration.getUsername();
             String password = kafkaConfiguration.getPassword();
 
-            properties.setProperty(AdminClientConfig.SECURITY_PROTOCOL_CONFIG, "SASL_SSL");
-            properties.setProperty(SaslConfigs.SASL_MECHANISM, "SCRAM-SHA-256");
+            properties.setProperty(AdminClientConfig.SECURITY_PROTOCOL_CONFIG, kafkaConfiguration.getSecurityProtocol());
+            properties.setProperty(SaslConfigs.SASL_MECHANISM, kafkaConfiguration.getSaslMechanism());
             properties.setProperty(SaslConfigs.SASL_JAAS_CONFIG,
                     "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"" + username + "\" password=\"" + password + "\";");
         }
