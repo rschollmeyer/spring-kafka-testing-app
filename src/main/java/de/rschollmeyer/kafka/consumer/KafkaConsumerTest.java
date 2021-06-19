@@ -26,26 +26,29 @@ public class KafkaConsumerTest implements Runnable {
     public KafkaConsumerTest(KafkaConfiguration kafkaConfiguration) {
         this.kafkaConfiguration = kafkaConfiguration;
 
-        String brokers = String.join(",", kafkaConfiguration.getHosts());
-        String username = kafkaConfiguration.getUsername();
-        String password = kafkaConfiguration.getPassword();
-
         Properties properties = new Properties();
+
+        String brokers = String.join(",", kafkaConfiguration.getHosts());
 
         // necessary config
         properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers);
         properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 
-        properties.setProperty(AdminClientConfig.SECURITY_PROTOCOL_CONFIG, "SASL_SSL");
-        properties.setProperty(SaslConfigs.SASL_MECHANISM, "SCRAM-SHA-256");
-        properties.setProperty(SaslConfigs.SASL_JAAS_CONFIG,
-                "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"" + username + "\" password=\"" + password + "\";");
-
         // additional config
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, kafkaConfiguration.getConsumerGroupId());
         properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         properties.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+
+        if(kafkaConfiguration.isSecurityEnabled()) {
+            String username = kafkaConfiguration.getUsername();
+            String password = kafkaConfiguration.getPassword();
+
+            properties.setProperty(AdminClientConfig.SECURITY_PROTOCOL_CONFIG, "SASL_SSL");
+            properties.setProperty(SaslConfigs.SASL_MECHANISM, "SCRAM-SHA-256");
+            properties.setProperty(SaslConfigs.SASL_JAAS_CONFIG,
+                    "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"" + username + "\" password=\"" + password + "\";");
+        }
 
         this.kafkaConsumer = new KafkaConsumer<>(properties);
         this.kafkaConsumer.subscribe(Arrays.asList(kafkaConfiguration.getTopicName()));

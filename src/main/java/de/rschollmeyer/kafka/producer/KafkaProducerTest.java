@@ -27,20 +27,24 @@ public class KafkaProducerTest implements Runnable {
         Properties properties = new Properties();
 
         String brokers = String.join(",", kafkaConfiguration.getHosts());
-        String username = kafkaConfiguration.getUsername();
-        String password = kafkaConfiguration.getPassword();
 
         // necessary config
         properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers);
         properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
-        properties.setProperty(AdminClientConfig.SECURITY_PROTOCOL_CONFIG, "SASL_SSL");
-        properties.setProperty(SaslConfigs.SASL_MECHANISM, "SCRAM-SHA-256");
-        properties.setProperty(SaslConfigs.SASL_JAAS_CONFIG, "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"" + username + "\" password=\"" + password + "\";");
-
         // additional config
         properties.setProperty(ProducerConfig.ACKS_CONFIG, ""+kafkaConfiguration.getAcks());
+
+        if(kafkaConfiguration.isSecurityEnabled()) {
+            String username = kafkaConfiguration.getUsername();
+            String password = kafkaConfiguration.getPassword();
+
+            properties.setProperty(AdminClientConfig.SECURITY_PROTOCOL_CONFIG, "SASL_SSL");
+            properties.setProperty(SaslConfigs.SASL_MECHANISM, "SCRAM-SHA-256");
+            properties.setProperty(SaslConfigs.SASL_JAAS_CONFIG,
+                    "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"" + username + "\" password=\"" + password + "\";");
+        }
 
         this.producer = new KafkaProducer<>(properties);
     }
